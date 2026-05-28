@@ -1,0 +1,39 @@
+Language models are statistical systems that learn the probability distributions of sequences of words or tokens. They form the backbone of modern natural language processing, enabling machines to understand, generate, and manipulate text in ways that were once considered uniquely human.
+
+The transformer architecture, introduced in the paper "Attention Is All You Need," revolutionized the field. Unlike recurrent networks, transformers process entire sequences in parallel using self-attention mechanisms. Each token attends to every other token in the context window, learning rich relational representations.
+
+Self-attention computes three projections of the input — queries, keys, and values. The dot product between queries and keys produces attention scores, which are scaled and softmaxed to produce attention weights. These weights blend the value vectors to produce context-aware representations.
+
+Byte pair encoding is a subword tokenisation algorithm. It starts with individual characters and iteratively merges the most frequent adjacent pair, building a vocabulary of common subwords. This gives models a compact and flexible representation that handles rare words through composition.
+
+Training a language model requires enormous amounts of text. OpenWebText, a reproduction of OpenAI's WebText dataset, contains over 40 gigabytes of web pages linked from Reddit posts with high engagement. The model learns to predict the next token given all preceding tokens in a sequence.
+
+The loss function is cross-entropy between the predicted token distribution and the true next token. Minimising this loss is equivalent to maximising the likelihood of the training data under the model. Well-trained models achieve low perplexity, meaning they assign high probability to held-out text.
+
+Gradient descent with the AdamW optimiser is the standard training algorithm. AdamW combines adaptive moment estimation with decoupled weight decay, which improves generalisation. Learning rate warmup followed by cosine annealing helps stabilise early training and achieve better final performance.
+
+Causal masking ensures the model cannot attend to future tokens. A lower-triangular mask is applied to the attention scores before softmax, setting future positions to negative infinity. This prevents information leakage and is essential for autoregressive generation.
+
+At inference time the model samples tokens one at a time. The logits at the final position are passed through softmax to produce a probability distribution. Top-k sampling restricts sampling to the k most probable tokens, improving coherence while maintaining diversity.
+
+Temperature scaling controls the sharpness of the distribution. Low temperature makes the model more deterministic, concentrating probability mass on the top candidates. High temperature flattens the distribution, encouraging exploration and creative outputs.
+
+Layer normalisation is applied before the attention and feedforward sublayers in the pre-norm formulation. This stabilises gradients during training and allows the use of higher learning rates. Residual connections around each sublayer ensure smooth gradient flow through the full depth of the network.
+
+The feedforward sublayer expands the embedding dimension by a factor of four, applies a nonlinearity, and projects back. GPT-2 uses the GELU activation with the tanh approximation. This pointwise network allows each token position to transform its representation independently after attention has mixed information across positions.
+
+Weight tying between the token embedding matrix and the language model head reduces the parameter count while often improving performance. The embedding matrix learns to place semantically similar tokens nearby, and tying forces the output projection to use the same geometry.
+
+Positional embeddings are added to token embeddings to give the model information about the order of tokens. GPT-2 uses learned absolute positional embeddings, one vector per position up to the context length. More recent models use relative positional encodings or rotary embeddings for better length generalisation.
+
+Model scale matters enormously. GPT-2 was trained with 124 million, 345 million, 774 million, and 1.5 billion parameter variants. Larger models achieve lower perplexity on held-out data and exhibit stronger few-shot reasoning capabilities, a phenomenon studied extensively in subsequent scaling law research.
+
+Fine-tuning adapts a pre-trained model to a specific domain or task. The pre-trained weights provide a strong initialisation, and continued gradient descent on domain-specific text shifts the model's distribution. Lower learning rates and fewer steps prevent catastrophic forgetting of general knowledge.
+
+Regularisation during fine-tuning is important. Gradient clipping prevents exploding gradients that can destabilise training. Dropout, which randomly zeros activations during training, encourages the network to learn redundant representations that generalise better to unseen data.
+
+The context window defines the maximum number of tokens the model can attend to simultaneously. GPT-2 supports 1024 tokens. Within this window every token can influence every other token via attention. Beyond this window the model has no memory, which motivated the development of longer-context models.
+
+Evaluation metrics for language models include perplexity on a held-out set, downstream task accuracy after fine-tuning, and human preference ratings for open-ended generation. No single metric captures all aspects of model quality, making evaluation an active area of research.
+
+The relationship between model architecture, data quality, compute budget, and final capability is described by neural scaling laws. These empirical power-law relationships allow researchers to predict the performance of larger models before training them, guiding the efficient allocation of research resources.
